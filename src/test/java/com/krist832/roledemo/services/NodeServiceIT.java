@@ -5,6 +5,7 @@ import java.util.UUID;
 import com.krist832.roledemo.entities.Node;
 import com.krist832.roledemo.repositories.NodeCountryRepository;
 import com.krist832.roledemo.repositories.NodeRepository;
+import com.krist832.roledemo.repositories.NodeRoleRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,12 @@ public class NodeServiceIT {
 	@Autowired
 	NodeCountryRepository nodeCountryRepository;
 
+	@Autowired
+	NodeRoleRepository nodeRoleRepository;
+
 	private long numberOfRecordsBeforeTest;
+
+	//----------------------------------------------------CRUD-NODE-----------------------------------------------------
 
 	@Test
 	public void createNode() {
@@ -43,6 +49,54 @@ public class NodeServiceIT {
 		assertThat(newId).isNotNull();
 		assertThat(nodeRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
 	}
+
+	@Test
+	public void getOneById() {
+		Node actual = nodeService.getNodeById(UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd"));
+		assertThat(actual).isNotNull();
+	}
+
+	//----------------------------------------------------NODE-ROLES----------------------------------------------------
+
+	@Test
+	public void addRoleToNode(){
+		numberOfRecordsBeforeTest = nodeRoleRepository.count();
+		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
+		UUID employeeFrankieLoosveldId = UUID.fromString("ffcf3efb-8132-4922-bceb-49f274fb364b");
+
+		nodeService.addRoleToNode(nodeEuropeId, employeeFrankieLoosveldId, "handling responsible");
+
+		assertThat(nodeRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
+	}
+
+	@Test
+	public void updateRoleOfNode(){
+		// case region manager of Europe must change from Guido Pallemans to Frankie Loosveld
+		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
+		UUID roleRegionManagerId = UUID.fromString("71dba9a1-2352-4170-9bc0-5ad08b2d1bfe");
+		UUID employeeFrankieLoosveldId = UUID.fromString("ffcf3efb-8132-4922-bceb-49f274fb364b");
+
+		Node node = nodeService.updateRoleOfNode(roleRegionManagerId, nodeEuropeId, employeeFrankieLoosveldId);
+
+		assertThat(node.getNodeRoles()
+					   .stream()
+					   .filter(nodeRole -> nodeRole.getName().equals("region manager"))
+				       .map(nodeRole -> nodeRole.getEmployee().getName()))
+					   .anyMatch(name -> name.equals("Frankie Loosveld"));
+	}
+
+	@Test
+	public void removeRoleFromNode(){
+		numberOfRecordsBeforeTest = nodeRoleRepository.count();
+		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
+		UUID roleRegionManagerId = UUID.fromString("71dba9a1-2352-4170-9bc0-5ad08b2d1bfe");
+
+		nodeService.removeRoleFromNode(roleRegionManagerId, nodeEuropeId);
+
+		assertThat(nodeRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest - 1);
+	}
+
+	//----------------------------------------------------COUNTRIES-----------------------------------------------------
 
 	@Test
 	public void addCountryToNode() {
@@ -66,22 +120,8 @@ public class NodeServiceIT {
 		assertThat(nodeCountryRepository.count()).isEqualTo(numberOfRecordsBeforeTest - 1);
 	}
 
-	@Test
-	public void addRoleToNode() {
-		numberOfRecordsBeforeTest = nodeCountryRepository.count();
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
-		UUID countryFranceId = UUID.fromString("7ba9d3a4-0ede-4e86-a91d-0f42594d77c2");
-
-		nodeService.addCountryToNode(countryFranceId, nodeEuropeId);
-
-		assertThat(nodeCountryRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
-	}
+	//--------------------------------------------------COUNTRY-ROLES---------------------------------------------------
 
 
 
-	@Test
-	public void getOneById() {
-		Node actual = nodeService.getNodeById(UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd"));
-		assertThat(actual).isNotNull();
-	}
 }

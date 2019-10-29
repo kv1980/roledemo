@@ -26,5 +26,6 @@ public class NodeRole extends AbstractRole {
 	public NodeRole(final Node node, final String name, final Employee employee ) {
 		super(name, employee);
 		this.node = node;
+		node.getNodeRoles().add(this);
 	}
 }

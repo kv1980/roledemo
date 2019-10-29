@@ -16,7 +16,7 @@ import org.hibernate.annotations.GenericGenerator;
 @NoArgsConstructor
 @Getter
 @ToString
-abstract class AbstractRole {
+public abstract class AbstractRole {
 
 	@Id
 	@GeneratedValue(generator = "uuid2")
@@ -31,6 +31,10 @@ abstract class AbstractRole {
 
 	AbstractRole(final String name, final Employee employee) {
 		this.name = name;
+		this.employee = employee;
+	}
+
+	public void changeEmployee(final Employee employee) {
 		this.employee = employee;
 	}
 }
