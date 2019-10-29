@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql://localhost/roledemo?currentSchema=roledemo
+    jdbc-url: jdbc:tc:postgresql://localhost/roledemo?currentSchema=roledemo #needed as datasource is created through config class
+    username: postgres
+    password: postgres
+    hikari:
+      initialization-timeout: -1
+      minimum-idle: 0
+  jpa:
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+          temp:
+            use_jdbc_metadata_defaults: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none

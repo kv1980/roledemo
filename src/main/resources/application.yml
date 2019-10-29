@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost/roledemo?currentSchema=roledemo
+    jdbc-url: jdbc:postgresql://localhost/roledemo?currentSchema=roledemo
+    platform: postgresql
+    username: roledemo
+    password: roledemo
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      javax.persistence.validation.mode: none
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        temp:
+          use_jdbc_metadata_defaults: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
