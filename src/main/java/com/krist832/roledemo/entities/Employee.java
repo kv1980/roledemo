@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity

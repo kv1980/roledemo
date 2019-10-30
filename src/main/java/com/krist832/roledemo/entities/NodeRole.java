@@ -19,7 +19,6 @@ public class NodeRole extends AbstractRole {
 	@ManyToOne
 	@JoinTable(name = "node_roles", joinColumns = {@JoinColumn(name = "role_id")},
 			   inverseJoinColumns = {@JoinColumn(name = "node_id")})
-	@ToString.Exclude
 	private Node node;
 
 	public NodeRole(final Node node, final Employee employee, final String name) {
