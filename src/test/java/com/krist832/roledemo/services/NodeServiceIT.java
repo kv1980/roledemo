@@ -1,9 +1,12 @@
 package com.krist832.roledemo.services;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import com.krist832.roledemo.entities.Node;
+import com.krist832.roledemo.entities.NodeCountry;
 import com.krist832.roledemo.repositories.NodeCountryRepository;
+import com.krist832.roledemo.repositories.NodeCountryRoleRepository;
 import com.krist832.roledemo.repositories.NodeRepository;
 import com.krist832.roledemo.repositories.NodeRoleRepository;
 import org.junit.Test;
@@ -24,6 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import(NodeService.class)
 public class NodeServiceIT {
 
+	private static final UUID NODE_EUROPE_ID = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
+
+	private static final UUID COUNTRY_BELGIUM_ID = UUID.fromString("3f5ba304-7022-4a1a-a6e8-b28afca882d1");
+
+	private static final UUID ROLE_PALLEMANS_AS_MANAGER_ID = UUID.fromString("71dba9a1-2352-4170-9bc0-5ad08b2d1bfe");
+
+	private static final UUID ROLE_VANDAM_AS_REPRESENTATIVE_ID = UUID.fromString(
+			"5ca7c3a5-4fec-4bd3-b89f-9e9516156032");
+
+	private static final UUID EMPLOYEE_FRANKIE_LOOSVELD_ID = UUID.fromString("ffcf3efb-8132-4922-bceb-49f274fb364b");
+
 	@Autowired
 	NodeService nodeService;
 
@@ -31,10 +45,13 @@ public class NodeServiceIT {
 	NodeRepository nodeRepository;
 
 	@Autowired
+	NodeRoleRepository nodeRoleRepository;
+
+	@Autowired
 	NodeCountryRepository nodeCountryRepository;
 
 	@Autowired
-	NodeRoleRepository nodeRoleRepository;
+	NodeCountryRoleRepository nodeCountryRoleRepository;
 
 	private long numberOfRecordsBeforeTest;
 
@@ -52,46 +69,40 @@ public class NodeServiceIT {
 
 	@Test
 	public void getOneById() {
-		Node actual = nodeService.getNodeById(UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd"));
+		Node actual = nodeService.getNode(UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd"));
 		assertThat(actual).isNotNull();
 	}
 
 	//----------------------------------------------------NODE-ROLES----------------------------------------------------
 
 	@Test
-	public void addRoleToNode(){
+	public void addRoleToNode() {
 		numberOfRecordsBeforeTest = nodeRoleRepository.count();
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
-		UUID employeeFrankieLoosveldId = UUID.fromString("ffcf3efb-8132-4922-bceb-49f274fb364b");
 
-		nodeService.addRoleToNode(nodeEuropeId, employeeFrankieLoosveldId, "handling responsible");
+		nodeService.addRoleToNode(NODE_EUROPE_ID, EMPLOYEE_FRANKIE_LOOSVELD_ID, "handling responsible");
 
 		assertThat(nodeRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
 	}
 
 	@Test
-	public void updateRoleOfNode(){
-		// case region manager of Europe must change from Guido Pallemans to Frankie Loosveld
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
-		UUID roleRegionManagerId = UUID.fromString("71dba9a1-2352-4170-9bc0-5ad08b2d1bfe");
-		UUID employeeFrankieLoosveldId = UUID.fromString("ffcf3efb-8132-4922-bceb-49f274fb364b");
-
-		Node node = nodeService.updateRoleOfNode(roleRegionManagerId, nodeEuropeId, employeeFrankieLoosveldId);
+	public void updateRoleOfNode() {
+		// case manager of Europe must change from Guido Pallemans to Frankie Loosveld
+		Node node = nodeService.updateRoleOfNode(NODE_EUROPE_ID, ROLE_PALLEMANS_AS_MANAGER_ID,
+												 EMPLOYEE_FRANKIE_LOOSVELD_ID);
 
 		assertThat(node.getNodeRoles()
 					   .stream()
-					   .filter(nodeRole -> nodeRole.getName().equals("region manager"))
-				       .map(nodeRole -> nodeRole.getEmployee().getName()))
-					   .anyMatch(name -> name.equals("Frankie Loosveld"));
+					   .filter(nodeRole -> nodeRole.getName()
+												   .equals("region manager"))
+					   .map(nodeRole -> nodeRole.getEmployee()
+												.getName())).anyMatch(name -> name.equals("Frankie Loosveld"));
 	}
 
 	@Test
-	public void removeRoleFromNode(){
+	public void removeRoleFromNode() {
 		numberOfRecordsBeforeTest = nodeRoleRepository.count();
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
-		UUID roleRegionManagerId = UUID.fromString("71dba9a1-2352-4170-9bc0-5ad08b2d1bfe");
 
-		nodeService.removeRoleFromNode(roleRegionManagerId, nodeEuropeId);
+		nodeService.removeRoleFromNode(NODE_EUROPE_ID, ROLE_PALLEMANS_AS_MANAGER_ID);
 
 		assertThat(nodeRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest - 1);
 	}
@@ -101,10 +112,9 @@ public class NodeServiceIT {
 	@Test
 	public void addCountryToNode() {
 		numberOfRecordsBeforeTest = nodeCountryRepository.count();
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
 		UUID countryFranceId = UUID.fromString("7ba9d3a4-0ede-4e86-a91d-0f42594d77c2");
 
-		nodeService.addCountryToNode(countryFranceId, nodeEuropeId);
+		nodeService.addCountryToNode(NODE_EUROPE_ID, countryFranceId);
 
 		assertThat(nodeCountryRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
 	}
@@ -112,16 +122,50 @@ public class NodeServiceIT {
 	@Test
 	public void removeCountryFromNode() {
 		numberOfRecordsBeforeTest = nodeCountryRepository.count();
-		UUID nodeEuropeId = UUID.fromString("2234cf74-9a26-4772-94a8-adb730b5b4cd");
-		UUID countryBelgiumId = UUID.fromString("3f5ba304-7022-4a1a-a6e8-b28afca882d1");
 
-		nodeService.removeCountryFromNode(countryBelgiumId, nodeEuropeId);
+		nodeService.removeCountryFromNode(NODE_EUROPE_ID, COUNTRY_BELGIUM_ID);
 
 		assertThat(nodeCountryRepository.count()).isEqualTo(numberOfRecordsBeforeTest - 1);
 	}
 
 	//--------------------------------------------------COUNTRY-ROLES---------------------------------------------------
 
+	@Test
+	public void addRoleToNodeCountry() {
+		numberOfRecordsBeforeTest = nodeCountryRoleRepository.count();
 
+		nodeService.addRoleToNodeCountry(NODE_EUROPE_ID, COUNTRY_BELGIUM_ID, EMPLOYEE_FRANKIE_LOOSVELD_ID,
+										 "sales representative");
 
+		assertThat(nodeCountryRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest + 1);
+	}
+
+	@Test
+	public void updateRoleOfNodeCountry() {
+		// case sales representative of country Belgium in node Europe must change from Alain Vandam to Frankie Loosveld
+		Node node = nodeService.updateRoleOfNodeCountry(NODE_EUROPE_ID, COUNTRY_BELGIUM_ID,
+														ROLE_VANDAM_AS_REPRESENTATIVE_ID, EMPLOYEE_FRANKIE_LOOSVELD_ID);
+
+		assertThat(node.getNodeCountries()
+					   .stream()
+					   .filter(nodeCountry -> nodeCountry.getCountry()
+														 .getName()
+														 .equals("Belgium"))
+					   .map(NodeCountry::getNodeCountryRoles)
+					   .flatMap(Collection::stream)
+					   .filter(nodeCountryRole -> nodeCountryRole.getName()
+																 .equals("sales representative"))
+					   .map(nodeCountryRole -> nodeCountryRole.getEmployee()
+															  .getName())).anyMatch(
+				name -> name.equals("Frankie Loosveld"));
+	}
+
+	@Test
+	public void removeRoleFromNodeCountry() {
+		numberOfRecordsBeforeTest = nodeCountryRoleRepository.count();
+
+		nodeService.removeRoleFromNodeCountry(NODE_EUROPE_ID, COUNTRY_BELGIUM_ID, ROLE_VANDAM_AS_REPRESENTATIVE_ID);
+
+		assertThat(nodeCountryRoleRepository.count()).isEqualTo(numberOfRecordsBeforeTest - 1);
+	}
 }

@@ -17,7 +17,7 @@ CREATE TABLE roledemo.nodes (
 
 CREATE TABLE roledemo.roles (
     id UUID PRIMARY KEY,
-    name varchar(20) UNIQUE,
+    name varchar(20),
     employee_id UUID REFERENCES roledemo.employees(id)
 );
 
@@ -34,6 +34,6 @@ CREATE TABLE roledemo.node_roles (
 
 CREATE TABLE roledemo.node_country_roles (
     role_id UUID PRIMARY KEY REFERENCES roledemo.roles(id),
-    node_id UUID REFERENCES roledemo.nodes(id),
-    country_id UUID REFERENCES roledemo.countries(id)
+    country_id UUID REFERENCES roledemo.countries(id),
+    node_id UUID REFERENCES roledemo.nodes(id)
 )

@@ -23,7 +23,7 @@ public class NodeRole extends AbstractRole {
 	@ToString.Exclude
 	private Node node;
 
-	public NodeRole(final Node node, final String name, final Employee employee ) {
+	public NodeRole(final Node node, final Employee employee, final String name) {
 		super(name, employee);
 		this.node = node;
 		node.getNodeRoles().add(this);
