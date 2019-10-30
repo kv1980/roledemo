@@ -15,7 +15,6 @@ import org.hibernate.annotations.GenericGenerator;
 @MappedSuperclass
 @NoArgsConstructor
 @Getter
-@ToString
 public abstract class AbstractRole {
 
 	@Id

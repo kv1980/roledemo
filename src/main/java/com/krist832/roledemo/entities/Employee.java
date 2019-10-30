@@ -15,7 +15,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "employees")
 @NoArgsConstructor
 @Getter
-@ToString
 public class Employee {
 
 	@Id

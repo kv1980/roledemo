@@ -14,7 +14,6 @@ import lombok.ToString;
 @Table(name = "roles")
 @NoArgsConstructor
 @Getter
-@ToString
 public class NodeRole extends AbstractRole {
 
 	@ManyToOne

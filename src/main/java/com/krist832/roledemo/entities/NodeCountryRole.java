@@ -14,7 +14,6 @@ import lombok.ToString;
 @Table(name = "roles")
 @NoArgsConstructor
 @Getter
-@ToString
 public class NodeCountryRole extends AbstractRole {
 
 	@ManyToOne
@@ -27,5 +26,6 @@ public class NodeCountryRole extends AbstractRole {
 	public NodeCountryRole(final NodeCountry nodeCountry, final Employee employee, final String name) {
 		super(name, employee);
 		this.nodeCountry = nodeCountry;
+		nodeCountry.getNodeCountryRoles().add(this);
 	}
 }

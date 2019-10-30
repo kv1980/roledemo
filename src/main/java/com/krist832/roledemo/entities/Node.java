@@ -19,7 +19,6 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "nodes")
 @NoArgsConstructor
 @Getter
-@ToString
 public class Node {
 
 	@Id
@@ -39,12 +38,5 @@ public class Node {
 		this.name = name;
 		this.nodeRoles = new HashSet<>();
 		this.nodeCountries = new HashSet<>();
-	}
-
-	public Set<Country> getCountries() {
-		return this.getNodeCountries()
-				   .stream()
-				   .map(NodeCountry::getCountry)
-				   .collect(Collectors.toSet());
 	}
 }
